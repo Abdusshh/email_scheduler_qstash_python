@@ -1,6 +1,4 @@
 {
-    "name": "email_scheduler",
-    "version": 2,
   "builds": [
     {
       "src": "email_scheduler/wsgi.py",
