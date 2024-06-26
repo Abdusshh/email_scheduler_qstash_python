@@ -33,6 +33,6 @@ def send_email_view(request):
         subject = data['subject']
         content = data['content']
         
-        send_email(to_email, subject, content)
-        return JsonResponse({'status': 'Email sent'}, status=200)
+        response = send_email(to_email, subject, content)
+        return JsonResponse({'status': response.status_code})
     return JsonResponse({'error': 'Invalid request'}, status=400)

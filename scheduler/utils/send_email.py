@@ -17,3 +17,5 @@ def send_email(to_email, subject, content):
         print(response.headers)
     except Exception as e:
         print(e.message)
+
+    return response
