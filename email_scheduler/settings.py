@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-4)=5ym^fko8p@b1dxw@7%gu+swd=vq_vq+q3d#r8s%rblf0@&8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1']
 
 
 # Application definition
@@ -128,3 +128,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SENDGRID_API_KEY = get_env_variable("SENDGRID_API_KEY")
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+APPEND_SLASH = False
