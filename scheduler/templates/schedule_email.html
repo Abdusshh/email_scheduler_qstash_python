@@ -7,11 +7,11 @@
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/128/1504/1504569.png" type="image/x-icon">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background-color: #f0f0f0;
             color: #333;
             margin: 0;
-            padding: 0;
+            padding: 0; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,6 +25,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px;
+            margin-top: 100px;
         }
         h1 {
             text-align: center;
@@ -38,6 +39,7 @@
             margin-top: 10px;
             font-weight: bold;
             color: #333;
+            font-family: Arial, Helvetica, sans-serif;
         }
         input, textarea {
             padding: 10px;
@@ -49,15 +51,27 @@
         }
         button {
             background-color: #08CB91;
-            color: #fff;
+            color: #f0f0f0;
             padding: 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
         }
         button:hover {
             background-color: #6BE0BD;
+        }
+        .notification {
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: normal;
+            font-family: Helvetica Neue, sans-serif;
         }
         .footer {
             margin-top: 20px;
@@ -71,6 +85,8 @@
         textarea {
             resize: vertical;
             max-height: 250px;
+            min-height: 40px;
+            font-family: Arial, Helvetica, sans-serif;
         }
     </style>
 </head>
@@ -80,19 +96,30 @@
         <form method="post" action="{% url 'schedule-email' %}">
             {% csrf_token %}
             <label for="to_email">To Email:</label>
-            <input type="email" id="to_email" name="to_email" required>
-            
+            <input type="email" id="to_email" name="to_email" placeholder="recipient@example.com" required><br>
+        
             <label for="subject">Subject:</label>
-            <input type="text" id="subject" name="subject" required>
-            
+            <input type="text" id="subject" name="subject" placeholder="Your subject here" required><br>
+        
             <label for="content">Content:</label>
-            <textarea id="content" name="content" required></textarea>
+            <textarea id="content" name="content" placeholder="Your email content here" required></textarea><br>
             
-            <label for="delay">Delay (seconds):</label>
-            <input type="number" id="delay" name="delay" min="0" required>
+            <label for="schedule_date">Schedule Date and Time (UTC+0):</label>
+            <input type="datetime-local" id="schedule_date" name="schedule_date"><br>
+
+            <label for="cron_string">Cron String (UTC+0):</label>
+            <input type="text" id="cron_string" name="cron_string" placeholder="* * * * *"><br>
+            <small>Enter a valid cron string. Example: "0 9 * * *" for 9 AM every day.</small><br>
             
             <button type="submit">Schedule Email</button>
         </form>
+        {% if email_scheduled %}
+            <div class="notification" id="notification">Email scheduled successfully!</div>
+        {% endif %}
+        {% if error %}
+            <div class="notification" id="notification">{{ error }}</div>
+        {% endif %}
+
     </div>
     <div class="footer">
         <p>Powered by  
