@@ -69,6 +69,10 @@
             vertical-align: middle;
             width: 100px;
         }
+        textarea {
+            resize: vertical;
+            max-height: 250px;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +96,12 @@
         </form>
     </div>
     <div class="footer">
-        <p>Powered by  <img src="{% static 'scheduler/images/upstash-icon.svg' %}" alt="Upstash Logo"> </p>
+        <p>Powered by  
+            <a href="https://www.upstash.com" target="_blank">
+              <img src="https://upstash.com/logo/upstash-white-bg.svg" alt="Upstash Logo">
+            </a> 
+          </p>
+          
     </div>
 </body>
 </html>
