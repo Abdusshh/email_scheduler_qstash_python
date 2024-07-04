@@ -45,11 +45,17 @@ This project is an email scheduler that allows you to schedule and send emails a
 
 6. Set the required environment variables:
 
-    Replace `QSTASH_TOKEN`, `QSTASH_URL`, `SENDGRID_API_KEY`, and `SENDGRID_SENDER_EMAIL_ADDRESS` with your own values.
+    Replace `QSTASH_TOKEN`, `DEPLOYED_URL`, `SENDGRID_API_KEY`, and `SENDGRID_SENDER_EMAIL_ADDRESS` with your own values. 
+    
+    You can find the `SENDGRID_API_KEY` and `SENDGRID_SENDER_EMAIL_ADDRESS` in your SendGrid account.
+
+    You can find the `QSTASH_TOKEN` in your Upstash account.
+
+    You can leave the `DEPLOYED_URL` blank and set it later when you deploy the application.
 
 ## Usage
 
-1. Run the application:
+1. Run the application locally:
 
     ```bash
     python manage.py runserver

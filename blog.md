@@ -11,7 +11,7 @@ In this post, we will demonstrate how to build an email scheduler using the [QSt
 
 ### Motivation
 
-Scheduling emails can be a crucial requirement for many applications, whether it's for sending out reminders, newsletters, or notifications. Automating this process can save time and ensure consistency. Using QStash Python SDK simplifies the process of scheduling emails by leveraging Upstash's message queuing service.
+Being able to schedule emails is quite important for many applications. Whether you are sending reminders, newsletters, or notifications, automating your emails ensures your messages are always delivered on time which can save you lots of time. Using QStash, it has never been easier to schedule messages to be sent at a later time. After reading this post all your emails will be delivered on time, every time.
 
 ### Prerequisites
 
@@ -19,7 +19,7 @@ To follow along with this tutorial, you will need:
 
 1. Basic knowledge of Python and Django.
 2. A SendGrid account and API key for sending emails.
-3. Upstash account to access QStash.
+3. An Upstash account to get your QStash token.
 
 ### Project Setup
 
@@ -28,29 +28,34 @@ To follow along with this tutorial, you will need:
 Install the QStash Python SDK, Django, SendGrid and other necessary packages:
 
 ```bash
-pip install qstash-python sendgrid python-dotenv django
+pip install qstash-python django sendgrid python-dotenv croniter
 ```
+
+QStash Python SDK is used to interact with QStash, SendGrid is used to send emails, django is used to create the web application, croniter is used to validate CRON expressions, and python-dotenv is used to load environment variables from a `.env` file.
 
 #### Create a Django Project
 
 First, set up a new Django project. Navigate to your desired directory and run:
 
 ```bash
-django-admin startproject emailscheduler
-cd emailscheduler
+django-admin startproject email_scheduler
+cd email_scheduler
 django-admin startapp scheduler
 ```
 
 #### Configure Django Settings
 
-Add `scheduler` to your `INSTALLED_APPS` in `settings.py`:
+Add `scheduler` to your `INSTALLED_APPS` and set `APPEND_SLASH` to `False` in the project's `settings.py`:
 
 ```python
 INSTALLED_APPS = [
     ...
     'scheduler',
 ]
+
+APPEND_SLASH = False
 ```
+
 
 Add your SendGrid and QStash configurations to your .env file:
 
@@ -58,7 +63,7 @@ Add your SendGrid and QStash configurations to your .env file:
 SENDGRID_API_KEY = 'your_sendgrid_api_key'
 SENDGRID_SENDER_EMAIL_ADDRESS = 'your_sender_email_address'
 QSTASH_TOKEN = 'your_qstash_token'
-QSTASH_URL = 'your_qstash_url'
+DEPLOYED_URL = 'your_deployed_url'
 ```
 
 ### Implementing the Email Scheduler
@@ -118,20 +123,20 @@ from .helpers import get_env_variable
 def schedule_email(email_data, delay):
     client = Client(get_env_variable("QSTASH_TOKEN"))
     client.publish_json({
-        "url": get_env_variable("QSTASH_URL"),  # Update with your server's URL
+        "url": get_env_variable("DEPLOYED_URL"),
         "body": email_data,
         "delay": delay,
     })
 ```
 
-And another function to be able to use CRON expressions in `scheduler/utils/email_scheduler.py`:
+And another function to the same file to schedule emails using CRON expressions:
 
 ```python
 def schedule_email_cronjob(email_data, cron_string):
     client = Client(get_env_variable("QSTASH_TOKEN"))
     schedules = client.schedules()
     response = schedules.create({
-        "destination": get_env_variable("QSTASH_URL"),  # Update with your server's URL
+        "destination": get_env_variable("DEPLOYED_URL"),
         "cron": cron_string,
         "body": email_data
     })
@@ -143,6 +148,7 @@ def schedule_email_cronjob(email_data, cron_string):
 In `scheduler/views.py`, add a view to handle email scheduling requests:
 
 ```python
+from croniter import croniter
 from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import datetime
@@ -170,7 +176,7 @@ def schedule_email_view(request):
 
         if cron_string:
             # Validate cron string format
-            if not is_valid_cron(cron_string):
+            if not croniter.is_valid(cron_string):
                 return render(request, 'schedule_email.html', {
                     'email_scheduled': email_scheduled,
                     'error': 'Invalid cron string format. Please enter a valid cron string.'
@@ -215,15 +221,6 @@ def schedule_email_view(request):
 
 We use the `@csrf_exempt` decorator to allow POST requests without CSRF tokens. This view handles both specific date and time scheduling and CRON string scheduling. The `schedule_email` function schedules emails to be sent after a specific delay, while the `schedule_email_cronjob` function schedules emails based on a CRON expression.
 
-Another function to check if the CRON expression is valid in `scheduler/views.py`:
-
-```python
-CRON_REGEX = re.compile(r'^(?#minute)(\*|(?:[0-9]|(?:[1-5][0-9]))(?:(?:\-[0-9]|\-(?:[1-5][0-9]))?|(?:\,(?:[0-9]|(?:[1-5][0-9])))*)) (?#hour)(\*|(?:[0-9]|1[0-9]|2[0-3])(?:(?:\-(?:[0-9]|1[0-9]|2[0-3]))?|(?:\,(?:[0-9]|1[0-9]|2[0-3]))*)) (?#day_of_month)(\*|(?:[1-9]|(?:[12][0-9])|3[01])(?:(?:\-(?:[1-9]|(?:[12][0-9])|3[01]))?|(?:\,(?:[1-9]|(?:[12][0-9])|3[01]))*)) (?#month)(\*|(?:[1-9]|1[012]|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(?:(?:\-(?:[1-9]|1[012]|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))?|(?:\,(?:[1-9]|1[012]|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))*)) (?#day_of_week)(\*|(?:[0-6]|SUN|MON|TUE|WED|THU|FRI|SAT)(?:(?:\-(?:[0-6]|SUN|MON|TUE|WED|THU|FRI|SAT))?|(?:\,(?:[0-6]|SUN|MON|TUE|WED|THU|FRI|SAT))*))$')
-
-def is_valid_cron(cron_string):
-    return bool(CRON_REGEX.match(cron_string))
-```
-
 #### Create a Django View to Handle Email Sending
 
 In `scheduler/views.py`, add a view to handle email sending requests:
@@ -242,11 +239,11 @@ def send_email_view(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 ```
 
-The URL of this view will be used as the destination URL in the QStash message. The view receives the email data as a JSON object and sends the email using the `send_email` function.
+The URL of this view will be used as the destination URL in the QStash message once it is deployed. The view receives the email data as a JSON object and sends the email using the `send_email` function.
 
 #### Create URL Patterns
 
-In `scheduler/urls.py`, add a URL pattern for the view:
+In `scheduler/urls.py`, add URL patterns for the views:
 
 ```python
 from django.urls import path
@@ -258,9 +255,22 @@ urlpatterns = [
 ]
 ```
 
+#### Update the Project's URL Patterns
+We will also add the URL patterns for the `scheduler` app to the project's URL patterns in `email_scheduler/urls.py`:
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('scheduler/', include('scheduler.urls')),
+]
+```
+
 #### Create a Template for Email Scheduling
 
-Create a template `scheduler/templates/scheduler/schedule_email.html`:
+Create a template `scheduler/templates/schedule_email.html`:
 
 ```html
 <!DOCTYPE html>
@@ -410,12 +420,10 @@ You can also add some CSS to style the template:
 
 ### Conclusion
 
-In this tutorial, we have shown how to build an email scheduler using the QStash Python SDK, SendGrid, and Django. This setup allows you to automate email sending, ensuring timely and consistent communication with your users. For more detailed information and advanced configurations, explore the [QStash documentation](https://upstash.com/docs/qstash/overview).
+In this tutorial, we have shown how to build an email scheduler using the QStash Python SDK, SendGrid, and Django. This project helps you automate your emails, ensuring you communicate with your users consistently and on time.
 
-You can find the complete source code for this project on [GitHub](https://github.com/Abdusshh/email_scheduler_qstash_python). You can contact me on [LinkedIn](https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/) for any questions or feedback. 
+For more detailed information, explore the [Upstash QStash documentation](https://upstash.com/docs/qstash/overall/getstarted). You can find the complete source code for this project on the [GitHub repository](https://github.com/Abdusshh/email_scheduler_qstash_python). For any questions or feedback, feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/). 
 
-Here is a [live demo](https://email-scheduler-dun.vercel.app/scheduler/schedule-email) of the project deployed on Vercel.
-
-Happy coding!
+Here is a [live demo](https://email-scheduler-dun.vercel.app/scheduler/schedule-email) of the project deployed on Vercel for you to try it out.
 
 ---

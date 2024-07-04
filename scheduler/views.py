@@ -1,4 +1,4 @@
-import re
+from croniter import croniter
 from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import datetime
@@ -6,11 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from .utils.email_scheduler import schedule_email, schedule_email_cronjob
 from .utils.send_email import send_email
-
-CRON_REGEX = re.compile(r'^(?#minute)(\*|(?:[0-9]|(?:[1-5][0-9]))(?:(?:\-[0-9]|\-(?:[1-5][0-9]))?|(?:\,(?:[0-9]|(?:[1-5][0-9])))*)) (?#hour)(\*|(?:[0-9]|1[0-9]|2[0-3])(?:(?:\-(?:[0-9]|1[0-9]|2[0-3]))?|(?:\,(?:[0-9]|1[0-9]|2[0-3]))*)) (?#day_of_month)(\*|(?:[1-9]|(?:[12][0-9])|3[01])(?:(?:\-(?:[1-9]|(?:[12][0-9])|3[01]))?|(?:\,(?:[1-9]|(?:[12][0-9])|3[01]))*)) (?#month)(\*|(?:[1-9]|1[012]|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(?:(?:\-(?:[1-9]|1[012]|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))?|(?:\,(?:[1-9]|1[012]|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))*)) (?#day_of_week)(\*|(?:[0-6]|SUN|MON|TUE|WED|THU|FRI|SAT)(?:(?:\-(?:[0-6]|SUN|MON|TUE|WED|THU|FRI|SAT))?|(?:\,(?:[0-6]|SUN|MON|TUE|WED|THU|FRI|SAT))*))$')
-
-def is_valid_cron(cron_string):
-    return bool(CRON_REGEX.match(cron_string))
 
 @csrf_exempt
 def schedule_email_view(request):
@@ -31,7 +26,7 @@ def schedule_email_view(request):
 
         if cron_string:
             # Validate cron string format
-            if not is_valid_cron(cron_string):
+            if not croniter.is_valid(cron_string):
                 return render(request, 'schedule_email.html', {
                     'email_scheduled': email_scheduled,
                     'error': 'Invalid cron string format. Please enter a valid cron string.'
