@@ -419,6 +419,8 @@ You can also add some CSS to style the template:
 ```
 And with that, the project is complete!
 
+![Email Scheduler](email-scheduler.png)
+
 ### Conclusion
 
 In this tutorial, we have shown how to build an email scheduler using the QStash Python SDK, SendGrid, and Django. This project helps you automate your emails, ensuring you communicate with your users consistently and on time.
