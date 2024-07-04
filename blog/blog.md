@@ -9,6 +9,10 @@ tags: [qstash, python, sdk, sendgrid, django]
 In this blog, we will demonstrate how to build an email scheduler using the [QStash Python SDK](https://upstash.com/docs/oss/sdks/py/qstash/overview) in combination with [SendGrid](https://sendgrid.com/en-us/solutions/email-api) and Django.
 
 
+Here is a [live demo](https://email-scheduler-dun.vercel.app/scheduler/schedule-email) of the project deployed on Vercel for you to try it out.
+
+![Email Scheduler](email-scheduler.png)
+
 ### Motivation
 
 Being able to schedule emails is quite important for many applications. Whether you are sending reminders, newsletters, or notifications, automating your emails ensures your messages are always delivered on time which can save you lots of time. Using QStash, it has never been easier to schedule messages to be sent at a later time. After reading this post all your emails will be delivered on time, every time.
@@ -419,14 +423,10 @@ You can also add some CSS to style the template:
 ```
 And with that, the project is complete!
 
-![Email Scheduler](email-scheduler.png)
-
 ### Conclusion
 
 In this tutorial, we have shown how to build an email scheduler using the QStash Python SDK, SendGrid, and Django. This project helps you automate your emails, ensuring you communicate with your users consistently and on time.
 
 For more detailed information, explore the [Upstash QStash documentation](https://upstash.com/docs/qstash/overall/getstarted). You can find the complete source code for this project on the [GitHub repository](https://github.com/Abdusshh/email_scheduler_qstash_python). For any questions or feedback, feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/). 
-
-Here is a [live demo](https://email-scheduler-dun.vercel.app/scheduler/schedule-email) of the project deployed on Vercel for you to try it out.
 
 ---
