@@ -116,8 +116,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Sendgrid settings
 SENDGRID_API_KEY = get_env_variable("SENDGRID_API_KEY")
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'  # This is 'apikey' for SendGrid
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY  # Your SendGrid API key
 
 # QStash settings
 APPEND_SLASH = False
