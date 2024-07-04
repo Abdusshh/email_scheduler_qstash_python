@@ -6,7 +6,7 @@ authors: [Abdullah Enes Güleş]
 tags: [qstash, python, sdk, sendgrid, django]
 ---
 
-In this post, we will demonstrate how to build an email scheduler using the [QStash Python SDK](https://upstash.com/docs/oss/sdks/py/qstash/overview) in combination with [SendGrid](https://sendgrid.com/en-us/solutions/email-api) and Django.
+In this blog, we will demonstrate how to build an email scheduler using the [QStash Python SDK](https://upstash.com/docs/oss/sdks/py/qstash/overview) in combination with [SendGrid](https://sendgrid.com/en-us/solutions/email-api) and Django.
 
 
 ### Motivation
@@ -25,7 +25,7 @@ To follow along with this tutorial, you will need:
 
 #### Install Necessary Packages
 
-Install the QStash Python SDK, Django, SendGrid and other necessary packages:
+Install QStash Python SDK, Django, SendGrid and other necessary packages:
 
 ```bash
 pip install qstash-python django sendgrid python-dotenv croniter
@@ -68,9 +68,9 @@ DEPLOYED_URL = 'your_deployed_url'
 
 ### Implementing the Email Scheduler
 
-#### A Helper Function to Get Environment Variables
+#### Getting Environment Variables
 
-In `scheduler/utils/helpers.py`, create a function to get environment variables:
+In `scheduler/utils/helpers.py`, create a helper function to get environment variables:
 
 ```python
 import os
@@ -197,7 +197,7 @@ def schedule_email_view(request):
                     'error': 'Schedule date cannot be in the past.'
                 })
             
-            # Check if schedule date is in the future more than a week
+            # Check if schedule date is in the future more than a week (free pricing limit)
             if (schedule_date - current_date).total_seconds() > 604800:
                 return render(request, 'schedule_email.html', {
                     'email_scheduled': email_scheduled,
@@ -268,7 +268,7 @@ urlpatterns = [
 ]
 ```
 
-#### Create a Template for Email Scheduling
+#### Create a Template for Scheduling Emails
 
 Create a template `scheduler/templates/schedule_email.html`:
 
@@ -417,6 +417,7 @@ You can also add some CSS to style the template:
     }
 </style>
 ```
+And with that, the project is complete!
 
 ### Conclusion
 
